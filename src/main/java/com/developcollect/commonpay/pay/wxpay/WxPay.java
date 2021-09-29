@@ -431,6 +431,13 @@ public class WxPay extends AbstractPay {
             RefundResponse refundResponse = new RefundResponse();
             refundResponse.setPayPlatform(getPlatform());
 
+            //不存在退款订单记录直接返回
+            if (resultMap.containsKey("err_code") && resultMap.get("err_code").equals("REFUNDNOTEXIST")) {
+                refundResponse.setRawObj((Serializable) resultMap);
+                refundResponse.setOutRefundNo(refundDTO.getOutRefundNo());
+                return refundResponse;
+            }
+
             // 确认当前查询的退款的下标
             int refundIdx;
             int refundCount = Integer.parseInt(resultMap.get("refund_count"));
