@@ -417,6 +417,32 @@ public class PayUtil {
     }
 
     /**
+     * 获取支付参数在小程序运行JS调起支付
+     *
+     * @param payDTO 支付参数
+     * @return WxJsPayResult
+     */
+    public static PayWxJsResult payAppletsJs(IPayDTO payDTO,String openId) {
+        payDTO.putExt(ExtKeys.PAY_WXJS_OPENID, openId);
+        PayWxJsResult payWxJsResult = payAppletsJs(payDTO);
+        return payWxJsResult;
+    }
+
+    /**
+     * 获取支付参数在小程序运行JS调起支付
+     *
+     * @param payDTO 支付参数
+     * @return WxJsPayResult
+     */
+    public static PayWxJsResult payAppletsJs(IPayDTO payDTO) {
+        Pay pay = GlobalConfig.payFactory().createPay(payDTO.getPayPlatform());
+        PayWxJsResult payWxJsResult = pay.payAppletsJs(payDTO);
+        return payWxJsResult;
+    }
+
+
+
+    /**
      * 不使用订单中的支付平台, 而是用指定的支付平台在微信浏览器里面使用WeixinJSBridge打开H5网页中执行JS调起支付
      * 仅微信支持
      *

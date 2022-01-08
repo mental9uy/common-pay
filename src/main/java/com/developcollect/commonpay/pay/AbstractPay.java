@@ -49,6 +49,11 @@ public abstract class AbstractPay implements Pay {
     }
 
     @Override
+    public PayWxJsResult payAppletsJs(IPayDTO payDTO) {
+        throw new PayException("暂不支持小程序JS支付");
+    }
+
+    @Override
     public PayResponse paySync(IPayDTO payDTO) {
         throw new PayException("暂不支持同步调用支付");
     }

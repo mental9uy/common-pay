@@ -277,6 +277,37 @@ public class WxPay extends AbstractPay {
         }
     }
 
+    @Override
+    public PayWxJsResult payAppletsJs(IPayDTO payDTO) {
+        try {
+            WxPayConfig wxPayConfig = getPayConfig();
+            wxPayConfig.setAppId(wxPayConfig.getAppletAppid());
+            Map<String, String> map = unifiedOrder(payDTO, wxPayConfig, "JSAPI",
+                    payDTO.getExt(ExtKeys.PAY_WXJS_OPENID).toString());
+            String prepayId = map.get("prepay_id");
+
+            Map<String, String> wxJsPayMap = new HashMap<>(8);
+            wxJsPayMap.put("package", "prepay_id=" + prepayId);
+            // 这里是深坑，微信js支付时有两次签名，第一次在统一下单处，然后用统一下单的返回的prepay_id再做一次签名
+            // 这两次签名的参数名风格不同，前面的是下滑线风格，这里是驼峰风格，这里的appId的I要大写
+            wxJsPayMap.put("appId", wxPayConfig.getAppId());
+            wxJsPayMap.put("nonceStr", WXPayUtil.generateNonceStr());
+            wxJsPayMap.put("timeStamp", String.valueOf((System.currentTimeMillis() / 1000)));
+            wxJsPayMap.put("signType", wxPayConfig.isDebug() ? WXPayConstants.MD5 : WXPayConstants.HMACSHA256);
+            wxJsPayMap.put("sign", WXPayUtil.generateSignature(wxJsPayMap, wxPayConfig.getKey(),
+                    wxPayConfig.isDebug() ? WXPayConstants.SignType.MD5 : WXPayConstants.SignType.HMACSHA256));
+            wxJsPayMap.put("prepayId", prepayId);
+
+            PayWxJsResult payWxJsResult = PayWxJsResult.of(wxJsPayMap);
+            return payWxJsResult;
+        } catch (Throwable throwable) {
+            log.error("微信支付失败");
+            throw throwable instanceof PayException
+                    ? (PayException) throwable
+                    : new PayException("微信支付失败", throwable);
+        }
+    }
+
     /**
      * 微信客户端外的移动端网页支付
      * https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_4

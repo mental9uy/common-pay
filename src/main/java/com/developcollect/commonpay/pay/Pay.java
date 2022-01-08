@@ -71,6 +71,17 @@ public interface Pay extends Serializable {
     PayWxJsResult payWxJs(IPayDTO payDTO);
 
     /**
+     * 通过小程序js实现支付
+     * 仅微信支持
+     *
+     * @param payDTO 支付参数
+     * @return PayWxJsResult
+     * @author Zhu Kaixiao
+     * @date 2020/8/15 13:49
+     */
+    PayWxJsResult payAppletsJs(IPayDTO payDTO);
+
+    /**
      * 同步调用支付
      * 直接返回支付结果，不使用异步通知的方式
      *

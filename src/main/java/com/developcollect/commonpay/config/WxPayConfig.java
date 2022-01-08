@@ -24,6 +24,11 @@ public class WxPayConfig extends AbstractPayConfig {
     private String appId;
 
     /**
+     * 小程序appid;
+     */
+    private String appletAppid;
+
+    /**
      * 商户id
      */
     private String mchId;
